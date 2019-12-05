@@ -62,3 +62,16 @@ func TestAddDeleteDomain(t *testing.T) {
 	// Next, we delete it.
 	ensure.Nil(t, mg.DeleteDomain(randomDomainName))
 }
+
+func TestVerifyDomain(t *testing.T) {
+	mg, err := NewMailgunFromEnv()
+	ensure.Nil(t, err)
+
+	_, domains, err := mg.GetDomains(DefaultLimit, DefaultSkip)
+	ensure.Nil(t, err)
+
+	state, err := mg.VerifyDomain(domains[0].Name)
+	ensure.Nil(t, err)
+
+	ensure.True(t, state != "")
+}

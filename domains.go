@@ -30,6 +30,7 @@ type Domain struct {
 	SMTPPassword string `json:"smtp_password"`
 	Wildcard     bool   `json:"wildcard"`
 	SpamAction   string `json:"spam_action"`
+	State        string `json:"state"`
 }
 
 // DNSRecord structures describe intended records to properly configure your domain for use with Mailgun.
@@ -121,4 +122,22 @@ func (m *MailgunImpl) DeleteDomain(name string) error {
 	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
+}
+
+type DomainResponse struct {
+	Domain              Domain      `json:"domain"`
+	ReceivingDNSRecords []DNSRecord `json:"receiving_dns_records"`
+	SendingDNSRecords   []DNSRecord `json:"sending_dns_records"`
+}
+
+// VerifyDomain verifies given domain and returns all information about that domain
+func (m *MailgunImpl) VerifyDomain(domain string) (string, error) {
+	r := newHTTPRequest(generatePublicApiUrl(m, domainsEndpoint) + "/" + domain + "/verify")
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
+
+	payload := newUrlEncodedPayload()
+	var resp DomainResponse
+	err := putResponseFromJSON(r, payload, &resp)
+	return resp.Domain.State, err
 }

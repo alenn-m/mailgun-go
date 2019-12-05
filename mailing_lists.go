@@ -61,10 +61,10 @@ type Member struct {
 }
 
 // GetLists returns the specified set of mailing lists administered by your account.
-func (mg *MailgunImpl) GetLists(limit, skip int, filter string) (int, []List, error) {
-	r := newHTTPRequest(generatePublicApiUrl(mg, listsEndpoint))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) GetLists(limit, skip int, filter string) (int, []List, error) {
+	r := newHTTPRequest(generatePublicApiUrl(m, listsEndpoint))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	if limit != DefaultLimit {
 		p.addValue("limit", strconv.Itoa(limit))
@@ -92,10 +92,10 @@ func (mg *MailgunImpl) GetLists(limit, skip int, filter string) (int, []List, er
 // Description, and AccessLevel are optional.
 // If unspecified, Description remains blank,
 // while AccessLevel defaults to Everyone.
-func (mg *MailgunImpl) CreateList(prototype List) (List, error) {
-	r := newHTTPRequest(generatePublicApiUrl(mg, listsEndpoint))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) CreateList(prototype List) (List, error) {
+	r := newHTTPRequest(generatePublicApiUrl(m, listsEndpoint))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	if prototype.Address != "" {
 		p.addValue("address", prototype.Address)
@@ -120,20 +120,20 @@ func (mg *MailgunImpl) CreateList(prototype List) (List, error) {
 
 // DeleteList removes all current members of the list, then removes the list itself.
 // Attempts to send e-mail to the list will fail subsequent to this call.
-func (mg *MailgunImpl) DeleteList(addr string) error {
-	r := newHTTPRequest(generatePublicApiUrl(mg, listsEndpoint) + "/" + addr)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) DeleteList(addr string) error {
+	r := newHTTPRequest(generatePublicApiUrl(m, listsEndpoint) + "/" + addr)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }
 
 // GetListByAddress allows your application to recover the complete List structure
 // representing a mailing list, so long as you have its e-mail address.
-func (mg *MailgunImpl) GetListByAddress(addr string) (List, error) {
-	r := newHTTPRequest(generatePublicApiUrl(mg, listsEndpoint) + "/" + addr)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) GetListByAddress(addr string) (List, error) {
+	r := newHTTPRequest(generatePublicApiUrl(m, listsEndpoint) + "/" + addr)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	response, err := makeGetRequest(r)
 	if err != nil {
 		return List{}, err
@@ -153,10 +153,10 @@ func (mg *MailgunImpl) GetListByAddress(addr string) (List, error) {
 // Be careful!  If changing the address of a mailing list,
 // e-mail sent to the old address will not succeed.
 // Make sure you account for the change accordingly.
-func (mg *MailgunImpl) UpdateList(addr string, prototype List) (List, error) {
-	r := newHTTPRequest(generatePublicApiUrl(mg, listsEndpoint) + "/" + addr)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) UpdateList(addr string, prototype List) (List, error) {
+	r := newHTTPRequest(generatePublicApiUrl(m, listsEndpoint) + "/" + addr)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	if prototype.Address != "" {
 		p.addValue("address", prototype.Address)
@@ -183,10 +183,10 @@ func (mg *MailgunImpl) UpdateList(addr string, prototype List) (List, error) {
 // The s parameter can be set to one of three settings to help narrow the returned data set:
 // All indicates that you want both Members and unsubscribed members alike, while
 // Subscribed and Unsubscribed indicate you want only those eponymous subsets.
-func (mg *MailgunImpl) GetMembers(limit, skip int, s *bool, addr string) (int, []Member, error) {
-	r := newHTTPRequest(generateMemberApiUrl(mg, listsEndpoint, addr))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) GetMembers(limit, skip int, s *bool, addr string) (int, []Member, error) {
+	r := newHTTPRequest(generateMemberApiUrl(m, listsEndpoint, addr))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	if limit != DefaultLimit {
 		p.addValue("limit", strconv.Itoa(limit))
@@ -211,10 +211,10 @@ func (mg *MailgunImpl) GetMembers(limit, skip int, s *bool, addr string) (int, [
 
 // GetMemberByAddress returns a complete Member structure for a member of a mailing list,
 // given only their subscription e-mail address.
-func (mg *MailgunImpl) GetMemberByAddress(s, l string) (Member, error) {
-	r := newHTTPRequest(generateMemberApiUrl(mg, listsEndpoint, l) + "/" + s)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) GetMemberByAddress(s, l string) (Member, error) {
+	r := newHTTPRequest(generateMemberApiUrl(m, listsEndpoint, l) + "/" + s)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	response, err := makeGetRequest(r)
 	if err != nil {
 		return Member{}, err
@@ -229,15 +229,15 @@ func (mg *MailgunImpl) GetMemberByAddress(s, l string) (Member, error) {
 // CreateMember registers a new member of the indicated mailing list.
 // If merge is set to true, then the registration may update an existing Member's settings.
 // Otherwise, an error will occur if you attempt to add a member with a duplicate e-mail address.
-func (mg *MailgunImpl) CreateMember(merge bool, addr string, prototype Member) error {
+func (m *MailgunImpl) CreateMember(merge bool, addr string, prototype Member) error {
 	vs, err := json.Marshal(prototype.Vars)
 	if err != nil {
 		return err
 	}
 
-	r := newHTTPRequest(generateMemberApiUrl(mg, listsEndpoint, addr))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+	r := newHTTPRequest(generateMemberApiUrl(m, listsEndpoint, addr))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newFormDataPayload()
 	p.addValue("upsert", yesNo(merge))
 	p.addValue("address", prototype.Address)
@@ -252,10 +252,10 @@ func (mg *MailgunImpl) CreateMember(merge bool, addr string, prototype Member) e
 
 // UpdateMember lets you change certain details about the indicated mailing list member.
 // Address, Name, Vars, and Subscribed fields may be changed.
-func (mg *MailgunImpl) UpdateMember(s, l string, prototype Member) (Member, error) {
-	r := newHTTPRequest(generateMemberApiUrl(mg, listsEndpoint, l) + "/" + s)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) UpdateMember(s, l string, prototype Member) (Member, error) {
+	r := newHTTPRequest(generateMemberApiUrl(m, listsEndpoint, l) + "/" + s)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newFormDataPayload()
 	if prototype.Address != "" {
 		p.addValue("address", prototype.Address)
@@ -285,10 +285,10 @@ func (mg *MailgunImpl) UpdateMember(s, l string, prototype Member) (Member, erro
 }
 
 // DeleteMember removes the member from the list.
-func (mg *MailgunImpl) DeleteMember(member, addr string) error {
-	r := newHTTPRequest(generateMemberApiUrl(mg, listsEndpoint, addr) + "/" + member)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) DeleteMember(member, addr string) error {
+	r := newHTTPRequest(generateMemberApiUrl(m, listsEndpoint, addr) + "/" + member)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }
@@ -302,10 +302,10 @@ func (mg *MailgunImpl) DeleteMember(member, addr string) error {
 // If a simple slice of strings is passed, each string refers to the member's e-mail address.
 // Otherwise, each Member needs to have at least the Address field filled out.
 // Other fields are optional, but may be set according to your needs.
-func (mg *MailgunImpl) CreateMemberList(u *bool, addr string, newMembers []interface{}) error {
-	r := newHTTPRequest(generateMemberApiUrl(mg, listsEndpoint, addr) + ".json")
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) CreateMemberList(u *bool, addr string, newMembers []interface{}) error {
+	r := newHTTPRequest(generateMemberApiUrl(m, listsEndpoint, addr) + ".json")
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newFormDataPayload()
 	if u != nil {
 		p.addValue("upsert", yesNo(*u))

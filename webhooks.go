@@ -11,10 +11,10 @@ import (
 
 // GetWebhooks returns the complete set of webhooks configured for your domain.
 // Note that a zero-length mapping is not an error.
-func (mg *MailgunImpl) GetWebhooks() (map[string]string, error) {
-	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) GetWebhooks() (map[string]string, error) {
+	r := newHTTPRequest(generateDomainApiUrl(m, webhooksEndpoint))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	var envelope struct {
 		Webhooks map[string]interface{} `json:"webhooks"`
 	}
@@ -32,10 +32,10 @@ func (mg *MailgunImpl) GetWebhooks() (map[string]string, error) {
 }
 
 // CreateWebhook installs a new webhook for your domain.
-func (mg *MailgunImpl) CreateWebhook(t, u string) error {
-	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) CreateWebhook(t, u string) error {
+	r := newHTTPRequest(generateDomainApiUrl(m, webhooksEndpoint))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("id", t)
 	p.addValue("url", u)
@@ -44,19 +44,19 @@ func (mg *MailgunImpl) CreateWebhook(t, u string) error {
 }
 
 // DeleteWebhook removes the specified webhook from your domain's configuration.
-func (mg *MailgunImpl) DeleteWebhook(t string) error {
-	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint) + "/" + t)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) DeleteWebhook(t string) error {
+	r := newHTTPRequest(generateDomainApiUrl(m, webhooksEndpoint) + "/" + t)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }
 
 // GetWebhookByType retrieves the currently assigned webhook URL associated with the provided type of webhook.
-func (mg *MailgunImpl) GetWebhookByType(t string) (string, error) {
-	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint) + "/" + t)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) GetWebhookByType(t string) (string, error) {
+	r := newHTTPRequest(generateDomainApiUrl(m, webhooksEndpoint) + "/" + t)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	var envelope struct {
 		Webhook struct {
 			Url string `json:"url"`
@@ -67,18 +67,18 @@ func (mg *MailgunImpl) GetWebhookByType(t string) (string, error) {
 }
 
 // UpdateWebhook replaces one webhook setting for another.
-func (mg *MailgunImpl) UpdateWebhook(t, u string) error {
-	r := newHTTPRequest(generateDomainApiUrl(mg, webhooksEndpoint) + "/" + t)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) UpdateWebhook(t, u string) error {
+	r := newHTTPRequest(generateDomainApiUrl(m, webhooksEndpoint) + "/" + t)
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("url", u)
 	_, err := makePutRequest(r, p)
 	return err
 }
 
-func (mg *MailgunImpl) VerifyWebhookRequest(req *http.Request) (verified bool, err error) {
-	h := hmac.New(sha256.New, []byte(mg.APIKey()))
+func (m *MailgunImpl) VerifyWebhookRequest(req *http.Request) (verified bool, err error) {
+	h := hmac.New(sha256.New, []byte(m.APIKey()))
 	io.WriteString(h, req.FormValue("timestamp"))
 	io.WriteString(h, req.FormValue("token"))
 

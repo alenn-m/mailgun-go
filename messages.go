@@ -163,7 +163,7 @@ func NewMessage(from string, subject string, text string, to ...string) *Message
 //
 // Note that you'll need to invoke the AddRecipientAndVariables or AddRecipient method
 // before sending, though.
-func (mg *MailgunImpl) NewMessage(from, subject, text string, to ...string) *Message {
+func (m *MailgunImpl) NewMessage(from, subject, text string, to ...string) *Message {
 	return &Message{
 		specific: &plainMessage{
 			from:    from,
@@ -171,7 +171,7 @@ func (mg *MailgunImpl) NewMessage(from, subject, text string, to ...string) *Mes
 			text:    text,
 		},
 		to: to,
-		mg: mg,
+		mg: m,
 	}
 }
 
@@ -210,13 +210,13 @@ func NewMIMEMessage(body io.ReadCloser, to ...string) *Message {
 //
 // Note that you'll need to invoke the AddRecipientAndVariables or AddRecipient method
 // before sending, though.
-func (mg *MailgunImpl) NewMIMEMessage(body io.ReadCloser, to ...string) *Message {
+func (m *MailgunImpl) NewMIMEMessage(body io.ReadCloser, to ...string) *Message {
 	return &Message{
 		specific: &mimeMessage{
 			body: body,
 		},
 		to: to,
-		mg: mg,
+		mg: m,
 	}
 }
 
@@ -655,11 +655,11 @@ func validateStringList(list []string, requireOne bool) bool {
 
 // GetStoredMessage retrieves information about a received e-mail message.
 // This provides visibility into, e.g., replies to a message sent to a mailing list.
-func (mg *MailgunImpl) GetStoredMessage(id string) (StoredMessage, error) {
-	url := generateStoredMessageUrl(mg, messagesEndpoint, id)
+func (m *MailgunImpl) GetStoredMessage(id string) (StoredMessage, error) {
+	url := generateStoredMessageUrl(m, messagesEndpoint, id)
 	r := newHTTPRequest(url)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var response StoredMessage
 	err := getResponseFromJSON(r, &response)
@@ -669,11 +669,11 @@ func (mg *MailgunImpl) GetStoredMessage(id string) (StoredMessage, error) {
 // GetStoredMessageRaw retrieves the raw MIME body of a received e-mail message.
 // Compared to GetStoredMessage, it gives access to the unparsed MIME body, and
 // thus delegates to the caller the required parsing.
-func (mg *MailgunImpl) GetStoredMessageRaw(id string) (StoredMessageRaw, error) {
-	url := generateStoredMessageUrl(mg, messagesEndpoint, id)
+func (m *MailgunImpl) GetStoredMessageRaw(id string) (StoredMessageRaw, error) {
+	url := generateStoredMessageUrl(m, messagesEndpoint, id)
 	r := newHTTPRequest(url)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	r.addHeader("Accept", "message/rfc2822")
 
 	var response StoredMessageRaw
@@ -683,10 +683,10 @@ func (mg *MailgunImpl) GetStoredMessageRaw(id string) (StoredMessageRaw, error) 
 
 // GetStoredMessageForURL retrieves information about a received e-mail message.
 // This provides visibility into, e.g., replies to a message sent to a mailing list.
-func (mg *MailgunImpl) GetStoredMessageForURL(url string) (StoredMessage, error) {
+func (m *MailgunImpl) GetStoredMessageForURL(url string) (StoredMessage, error) {
 	r := newHTTPRequest(url)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 
 	var response StoredMessage
 	err := getResponseFromJSON(r, &response)
@@ -696,10 +696,10 @@ func (mg *MailgunImpl) GetStoredMessageForURL(url string) (StoredMessage, error)
 // GetStoredMessageRawForURL retrieves the raw MIME body of a received e-mail message.
 // Compared to GetStoredMessage, it gives access to the unparsed MIME body, and
 // thus delegates to the caller the required parsing.
-func (mg *MailgunImpl) GetStoredMessageRawForURL(url string) (StoredMessageRaw, error) {
+func (m *MailgunImpl) GetStoredMessageRawForURL(url string) (StoredMessageRaw, error) {
 	r := newHTTPRequest(url)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	r.addHeader("Accept", "message/rfc2822")
 
 	var response StoredMessageRaw
@@ -711,11 +711,11 @@ func (mg *MailgunImpl) GetStoredMessageRawForURL(url string) (StoredMessageRaw, 
 // DeleteStoredMessage removes a previously stored message.
 // Note that Mailgun institutes a policy of automatically deleting messages after a set time.
 // Consult the current Mailgun API documentation for more details.
-func (mg *MailgunImpl) DeleteStoredMessage(id string) error {
-	url := generateStoredMessageUrl(mg, messagesEndpoint, id)
+func (m *MailgunImpl) DeleteStoredMessage(id string) error {
+	url := generateStoredMessageUrl(m, messagesEndpoint, id)
 	r := newHTTPRequest(url)
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }

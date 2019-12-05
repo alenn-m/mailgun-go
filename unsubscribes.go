@@ -13,16 +13,16 @@ type Unsubscription struct {
 
 // GetUnsubscribes retrieves a list of unsubscriptions issued by recipients of mail from your domain.
 // Zero is a valid list length.
-func (mg *MailgunImpl) GetUnsubscribes(limit, skip int) (int, []Unsubscription, error) {
-	r := newHTTPRequest(generateApiUrl(mg, unsubscribesEndpoint))
+func (m *MailgunImpl) GetUnsubscribes(limit, skip int) (int, []Unsubscription, error) {
+	r := newHTTPRequest(generateApiUrl(m, unsubscribesEndpoint))
 	if limit != DefaultLimit {
 		r.addParameter("limit", strconv.Itoa(limit))
 	}
 	if skip != DefaultSkip {
 		r.addParameter("skip", strconv.Itoa(skip))
 	}
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	var envelope struct {
 		TotalCount int              `json:"total_count"`
 		Items      []Unsubscription `json:"items"`
@@ -33,10 +33,10 @@ func (mg *MailgunImpl) GetUnsubscribes(limit, skip int) (int, []Unsubscription, 
 
 // GetUnsubscribesByAddress retrieves a list of unsubscriptions by recipient address.
 // Zero is a valid list length.
-func (mg *MailgunImpl) GetUnsubscribesByAddress(a string) (int, []Unsubscription, error) {
-	r := newHTTPRequest(generateApiUrlWithTarget(mg, unsubscribesEndpoint, a))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) GetUnsubscribesByAddress(a string) (int, []Unsubscription, error) {
+	r := newHTTPRequest(generateApiUrlWithTarget(m, unsubscribesEndpoint, a))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	var envelope struct {
 		TotalCount int              `json:"total_count"`
 		Items      []Unsubscription `json:"items"`
@@ -46,10 +46,10 @@ func (mg *MailgunImpl) GetUnsubscribesByAddress(a string) (int, []Unsubscription
 }
 
 // Unsubscribe adds an e-mail address to the domain's unsubscription table.
-func (mg *MailgunImpl) Unsubscribe(a, t string) error {
-	r := newHTTPRequest(generateApiUrl(mg, unsubscribesEndpoint))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) Unsubscribe(a, t string) error {
+	r := newHTTPRequest(generateApiUrl(m, unsubscribesEndpoint))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	p := newUrlEncodedPayload()
 	p.addValue("address", a)
 	p.addValue("tag", t)
@@ -60,10 +60,10 @@ func (mg *MailgunImpl) Unsubscribe(a, t string) error {
 // RemoveUnsubscribe removes the e-mail address given from the domain's unsubscription table.
 // If passing in an ID (discoverable from, e.g., GetUnsubscribes()), the e-mail address associated
 // with the given ID will be removed.
-func (mg *MailgunImpl) RemoveUnsubscribe(a string) error {
-	r := newHTTPRequest(generateApiUrlWithTarget(mg, unsubscribesEndpoint, a))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) RemoveUnsubscribe(a string) error {
+	r := newHTTPRequest(generateApiUrlWithTarget(m, unsubscribesEndpoint, a))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	_, err := makeDeleteRequest(r)
 	return err
 }
@@ -71,10 +71,10 @@ func (mg *MailgunImpl) RemoveUnsubscribe(a string) error {
 // RemoveUnsubscribe removes the e-mail address given from the domain's unsubscription table with a matching tag.
 // If passing in an ID (discoverable from, e.g., GetUnsubscribes()), the e-mail address associated
 // with the given ID will be removed.
-func (mg *MailgunImpl) RemoveUnsubscribeWithTag(a, t string) error {
-	r := newHTTPRequest(generateApiUrlWithTarget(mg, unsubscribesEndpoint, a))
-	r.setClient(mg.Client())
-	r.setBasicAuth(basicAuthUser, mg.APIKey())
+func (m *MailgunImpl) RemoveUnsubscribeWithTag(a, t string) error {
+	r := newHTTPRequest(generateApiUrlWithTarget(m, unsubscribesEndpoint, a))
+	r.setClient(m.Client())
+	r.setBasicAuth(basicAuthUser, m.APIKey())
 	r.addParameter("tag", t)
 	_, err := makeDeleteRequest(r)
 	return err

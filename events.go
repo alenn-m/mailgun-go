@@ -181,8 +181,8 @@ type EventIterator struct {
 // Use GetNext and GetPrevious thereafter as appropriate to iterate through sets of data.
 //
 // *This call is Deprecated, use ListEvents() instead*
-func (mg *MailgunImpl) NewEventIterator() *EventIterator {
-	return &EventIterator{mg: mg}
+func (m *MailgunImpl) NewEventIterator() *EventIterator {
+	return &EventIterator{mg: m}
 }
 
 // Create an new iterator to fetch a page of events from the events api
@@ -196,8 +196,8 @@ func (mg *MailgunImpl) NewEventIterator() *EventIterator {
 //	if it.Err() != nil {
 //		log.Fatal(it.Err())
 //	}
-func (mg *MailgunImpl) ListEvents(opts *EventsOptions) *EventIterator {
-	req := newHTTPRequest(generateApiUrl(mg, eventsEndpoint))
+func (m *MailgunImpl) ListEvents(opts *EventsOptions) *EventIterator {
+	req := newHTTPRequest(generateApiUrl(m, eventsEndpoint))
 	if opts != nil {
 		if opts.Limit > 0 {
 			req.addParameter("limit", fmt.Sprintf("%d", opts.Limit))
@@ -224,7 +224,7 @@ func (mg *MailgunImpl) ListEvents(opts *EventsOptions) *EventIterator {
 	}
 	url, err := req.generateUrlWithParameters()
 	return &EventIterator{
-		mg:            mg,
+		mg:            m,
 		eventResponse: eventResponse{Paging: Paging{Next: url, First: url}},
 		err:           err,
 	}
@@ -384,7 +384,7 @@ type EventPoller struct {
 //	if it.Err() != nil {
 //		log.Fatal(it.Err())
 //	}
-func (mg *MailgunImpl) PollEvents(opts *EventsOptions) *EventPoller {
+func (m *MailgunImpl) PollEvents(opts *EventsOptions) *EventPoller {
 	now := time.Now()
 	// ForceAscending must be set
 	opts.ForceAscending = true
@@ -406,9 +406,9 @@ func (mg *MailgunImpl) PollEvents(opts *EventsOptions) *EventPoller {
 	}
 
 	return &EventPoller{
-		it:   mg.ListEvents(opts),
+		it:   m.ListEvents(opts),
 		opts: *opts,
-		mg:   mg,
+		mg:   m,
 	}
 }
 
